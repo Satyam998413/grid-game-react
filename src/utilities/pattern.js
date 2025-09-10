@@ -10,7 +10,7 @@ function drawFixedGreenX(grid) {
   const cols = grid[0].length;
   const size = Math.min(rows, cols);
 
-  // Repeat X pattern every `size` rows
+  // Repeat X pattern
   for (let offset = 0; offset < rows; offset += size) {
     for (let i = 0; i < size && offset + i < rows; i++) {
       // ↘ pattern
@@ -31,29 +31,29 @@ function drawFullGreaterThan(grid, startRow) {
 
   if (rows < 3 || cols < 3) return;
 
+  const mid = Math.floor(rows / 2);
+
   for (let r = 0; r < rows; r++) {
     const row = startRow + r;
     if (row < 0 || row >= rows) continue;
 
     let c;
 
-    // ---- \ shape
-    if (r <= Math.floor(rows / 2)) {
-      c = r; 
-    } 
-    // ----/ shape
-    else {
-      c = rows - 1 - r; 
+    if (r <= mid) {
+      // Upper diagonal
+      c = Math.floor((r * (cols - 1)) / mid);
+    } else {
+      // Lower diagonal
+      c = Math.floor(((rows - 1 - r) * (cols - 1)) / (rows - 1 - mid));
     }
 
-    // Directly draw from left side
     if (c >= 0 && c < cols) {
       grid[row][c] = 1;
     }
   }
 }
 
-// moving ">" 
+// ">"
 function drawMovingInfiniteGreaterThan(grid, step) {
   const rows = grid.length;
 
@@ -65,7 +65,7 @@ function drawMovingInfiniteGreaterThan(grid, step) {
 export function getNextPatternGrid(rows, cols, step) {
   const grid = createEmptyGrid(rows, cols);
 
-  // Red ">"
+  // Red ">" symbol scrolling
   drawMovingInfiniteGreaterThan(grid, step);
 
   // Green fixed X
