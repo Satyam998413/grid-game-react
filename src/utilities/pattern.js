@@ -1,61 +1,72 @@
-// src/pattern.js
-
 export function createEmptyGrid(rows, cols) {
   return Array.from({ length: rows }, () =>
     Array.from({ length: cols }, () => 0)
   );
 }
 
-// fixed green X pattern
+// green X pattern
 function drawFixedGreenX(grid) {
   const rows = grid.length;
   const cols = grid[0].length;
+  const size = Math.min(rows, cols);
 
-  for (let i = 0; i < Math.min(rows, cols); i++) {
-    if (grid[i][i] === 0) grid[i][i] = 2; // ↘ diagonal
-    if (grid[i][cols - 1 - i] === 0) grid[i][cols - 1 - i] = 2; // ↙ diagonal
+  // Repeat X pattern every `size` rows
+  for (let offset = 0; offset < rows; offset += size) {
+    for (let i = 0; i < size && offset + i < rows; i++) {
+      // ↘ pattern
+      if (grid[offset + i][i] === 0) {
+        grid[offset + i][i] = 2;
+      }
+      // ↙ pattern
+      if (grid[offset + i][cols - 1 - i] === 0) {
+        grid[offset + i][cols - 1 - i] = 2;
+      }
+    }
   }
 }
 
-// "N" pattern draw
-function drawNAt(grid, startRow) {
+function drawFullGreaterThan(grid, startRow) {
   const rows = grid.length;
   const cols = grid[0].length;
 
-  // Ensure at least 3 cols for "N"
-  if (cols < 3) return;
+  if (rows < 3 || cols < 3) return;
 
   for (let r = 0; r < rows; r++) {
     const row = startRow + r;
     if (row < 0 || row >= rows) continue;
 
-    // Left vertical line
-    grid[row][0] = 1;
+    let c;
 
-    // Right vertical line
-    grid[row][cols - 1] = 1;
+    // ---- \ shape
+    if (r <= Math.floor(rows / 2)) {
+      c = r; 
+    } 
+    // ----/ shape
+    else {
+      c = rows - 1 - r; 
+    }
 
-    // Diagonal line
-    const c = Math.floor((r * (cols - 1)) / (rows - 1));
-    grid[row][c] = 1;
+    // Directly draw from left side
+    if (c >= 0 && c < cols) {
+      grid[row][c] = 1;
+    }
   }
 }
 
-// ✅ Infinite moving N's
-function drawMovingInfiniteN(grid, step) {
+// moving ">" 
+function drawMovingInfiniteGreaterThan(grid, step) {
   const rows = grid.length;
-  const size = rows; // Full height "N"
 
-  for (let offset = -size; offset < rows + size; offset += size) {
-    drawNAt(grid, (offset + step) % rows);
+  for (let offset = -rows; offset < rows * 2; offset += rows) {
+    drawFullGreaterThan(grid, (offset + step) % rows);
   }
 }
 
 export function getNextPatternGrid(rows, cols, step) {
   const grid = createEmptyGrid(rows, cols);
 
-  // Red moving N
-  drawMovingInfiniteN(grid, step);
+  // Red ">"
+  drawMovingInfiniteGreaterThan(grid, step);
 
   // Green fixed X
   drawFixedGreenX(grid);

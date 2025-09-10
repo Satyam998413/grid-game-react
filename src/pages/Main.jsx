@@ -1,14 +1,14 @@
 // src/App.jsx
-import { useState, useCallback, useRef } from "react";
-import {  getNextPatternGrid } from "../utilities/pattern";
+import { useState, useCallback, useRef, useEffect } from "react";
+import { getNextPatternGrid } from "../utilities/pattern";
 
 const Main = () => {
   const [rows, setRows] = useState(20);
-  const [cols, setCols] = useState(20);
+  const [cols, setCols] = useState(10);
   const [grid, setGrid] = useState(() => getNextPatternGrid(20, 20, 0, "plus"));
   const [running, setRunning] = useState(false);
   const [step, setStep] = useState(0);
-
+  console.log(step);
   const runningRef = useRef(running);
   runningRef.current = running;
 
@@ -24,18 +24,21 @@ const Main = () => {
     setTimeout(runSimulation, 300);
   }, [rows, cols]);
 
-  const handleResize = () => {
+  const handleResize = useCallback(() => {
     setStep(0);
-    setRunning(false)
     setGrid(getNextPatternGrid(rows, cols, 0));
-    setTimeout(() => {
-      setRunning(true)
-    }, 2000);
-  };
+  }, [rows, cols]);
+
+  useEffect(() => {
+    handleResize();
+    return () => {};
+  }, [handleResize]);
 
   return (
     <div className="flex flex-col items-center p-4">
-      <h1 className="text-xl font-bold mb-4">Red Priority Moving Pattern + Green Cross</h1>
+      <h1 className="text-xl font-bold mb-4">
+        Red Priority Moving Pattern + Green Cross
+      </h1>
 
       {/* Controls */}
       <div className="flex gap-2 mb-4">
@@ -67,11 +70,10 @@ const Main = () => {
           min="5"
           onChange={(e) => {
             if (+e.target.value < 5) {
-              setRows(5)
+              setRows(5);
             } else {
-              setRows(Number(e.target.value))
+              setRows(Number(e.target.value));
             }
-            handleResize()
           }}
           className="border p-1 rounded w-20"
         />
@@ -81,11 +83,10 @@ const Main = () => {
           min="5"
           onChange={(e) => {
             if (+e.target.value < 5) {
-              setCols(5)
+              setCols(5);
             } else {
-            setCols(Number(e.target.value))
+              setCols(Number(e.target.value));
             }
-            handleResize()
           }}
           className="border p-1 rounded w-20"
         />
@@ -119,5 +120,5 @@ const Main = () => {
       </div>
     </div>
   );
-}
-export default Main
+};
+export default Main;
